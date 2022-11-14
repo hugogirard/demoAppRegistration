@@ -58,5 +58,6 @@ module redis 'redis/redis.bicep' = {
   params: {
     location: location
     suffix: suffix
+    principalId: web.outputs.managedIdentityId
   }
 }
