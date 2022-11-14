@@ -41,5 +41,5 @@ jobs:
           scope: subscription
           region: ${{ env.LOCATION }}
           deploymentName:  ${{ env.DEPLOYMENT_NAME }}
-          template: ./bicep/main.bicep
+          template: ./bicep/main.json
           parameters: location=${{ env.LOCATION }} resourceGroupName=${{ env.RG_NAME }}      
