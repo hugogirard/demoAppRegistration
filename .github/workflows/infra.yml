@@ -1,0 +1,45 @@
+name: Create Azure Resources
+
+on:  
+  push:
+    branches:
+      - "main"
+    paths:
+      - "bicep/**/*.bicep"
+      - ".github/workflows/infra.yml"
+    
+  workflow_dispatch:
+
+jobs:
+  create-azure-resources:
+
+    env:
+      DEPLOYMENT_NAME: app-deployment
+      LOCATION: 'eastus'
+      RG_NAME: 'rg-app-registration-demo'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}      
+
+      - name: Validate that bicep builds
+        run: az bicep build -f main.bicep
+        working-directory: ./bicep
+
+      - name: deploy
+        id: createResources
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          scope: subscription
+          region: ${{ env.LOCATION }}
+          deploymentName:  ${{ env.DEPLOYMENT_NAME }}
+          template: ./bicep/main.bicep
+          parameters: location=${{ env.LOCATION }} resourceGroupName=${{ env.RG_NAME }}      
