@@ -39,7 +39,7 @@ resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
   kind: 'app'
 }
 
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
+resource webAppClient 'Microsoft.Web/sites@2020-06-01' = {
   name: 'webapp-blazor-${suffix}'
   location: location  
   identity: {
@@ -77,7 +77,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   }  
 }
 
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
+resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
   name: 'webapp-api-weather-${suffix}'
   location: location  
   identity: {
