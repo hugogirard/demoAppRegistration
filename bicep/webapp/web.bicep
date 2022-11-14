@@ -42,9 +42,6 @@ resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
 resource webAppClient 'Microsoft.Web/sites@2020-06-01' = {
   name: 'webapp-blazor-${suffix}'
   location: location  
-  identity: {
-    type: 'SystemAssigned'
-  }
   properties: {
     serverFarmId: serverFarm.id    
     siteConfig: {
@@ -114,3 +111,6 @@ resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true    
   }  
 }
+
+
+output managedIdentityId string = webAppApi.identity.principalId

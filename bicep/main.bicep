@@ -52,3 +52,11 @@ module web 'webapp/web.bicep' = {
   }
 }
 
+module redis 'redis/redis.bicep' = {
+  scope: resourceGroup(rg.name)
+  name: 'redis'
+  params: {
+    location: location
+    suffix: suffix
+  }
+}
