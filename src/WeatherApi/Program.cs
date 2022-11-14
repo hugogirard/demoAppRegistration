@@ -12,6 +12,10 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisCnxString"];
+});
 builder.Services.AddSingleton<IWeatherRepository, WeatherRepository>();
 
 var app = builder.Build();

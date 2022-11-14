@@ -77,9 +77,6 @@ resource webAppClient 'Microsoft.Web/sites@2020-06-01' = {
 resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
   name: 'webapp-api-weather-${suffix}'
   location: location  
-  identity: {
-    type: 'SystemAssigned'
-  }
   properties: {
     serverFarmId: serverFarm.id    
     siteConfig: {
@@ -111,6 +108,3 @@ resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true    
   }  
 }
-
-
-output managedIdentityId string = webAppApi.identity.principalId
