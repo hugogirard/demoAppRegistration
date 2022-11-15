@@ -82,3 +82,12 @@ Go to the **Users and groups** menu in the left blade and Add two users.
 
 Once is done, you should have something like this.
 
+![alt text](https://github.com/hugogirard/demoAppRegistration/blob/main/images/AssignedUsers.png?raw=true)
+
+# Create the client application
+
+For the client application we will use Postman, you will need to create another App Registration that represent Postman.  This amazing [blog article](https://dev.to/425show/calling-an-azure-ad-secured-api-with-postman-22co) tell you how to do this.
+
+# Configure your API with your Azure AD value
+
+Now, before calling the API, you will need to add some configuration about it's representation in Azure Active Directory.

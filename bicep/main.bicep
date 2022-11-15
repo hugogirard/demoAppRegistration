@@ -63,3 +63,4 @@ module web 'webapp/web.bicep' = {
   }
 }
 
+output webAppName string = web.outputs.webAppName

@@ -84,3 +84,5 @@ resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true    
   }  
 }
+
+output webAppName string = webAppApi.name
