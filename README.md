@@ -88,6 +88,28 @@ Once is done, you should have something like this.
 
 For the client application we will use Postman, you will need to create another App Registration that represent Postman.  This amazing [blog article](https://dev.to/425show/calling-an-azure-ad-secured-api-with-postman-22co) tell you how to do this.
 
+Once your Postman Auth application is created in App Registration, be sure to go to **API permission** menu in the left blade.
+
+You need to add the Contoso Weather API with the two scopes
+
+![alt text]()
+
+Now, give Grant admin consent to the two scopes, to understand more about Admin consent you can read the Microsoft official [documentation](https://learn.microsoft.com/en-us/azure/active-directory/manage-apps/grant-admin-consent?pivots=portal)
+
+
 # Configure your API with your Azure AD value
 
 Now, before calling the API, you will need to add some configuration about it's representation in Azure Active Directory.
+
+| Name | Value |
+| -----| ----- |
+| AzureAd:Instance | https://login.microsoftonline.com/ |
+| AzureAd:Domain | The domain associated with your Azure Active Directory |
+| AzureAd:TenantId | The tenant ID associated with your Azure Active Directory |
+| AzureAd:ClientId | The client ID of the App registrations of Contoso Weather |
+| AzureAd:Scopes:ReadWeatherScope | The value of the Read Weather Scope in the Expose API blade of your App registration.  Be sure to copy the complete value near the scope clicking the copy button. |
+| AzureAd:Scopes:ReadWeatherMars | Same than the previous step but for the scope Read.Weather.From.Mars
+
+## Deploy the Rest API
+
+Now, you can deploy the rest api, go to the GitHub actions tab and click on the **Deploy API** and run the workflow.

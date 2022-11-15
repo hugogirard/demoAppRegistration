@@ -1,0 +1,44 @@
+name: Deploy API
+
+on:      
+  workflow_dispatch:
+
+env:
+  AZURE_WEATHER_API_DIRECTORY: ./src/WeatherApi
+
+jobs:
+  build-deploy-weather-api:
+
+    env:
+      DEPLOYMENT_NAME: app-deployment
+      LOCATION: 'eastus'
+      RG_NAME: 'rg-app-registration-demo'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - uses: actions/checkout@v2
+
+      - name: Setup Dotnet 7.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: dotnet build and publish
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+          dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        working-directory: ${{ env.AZURE_WEATHER_API_DIRECTORY }}
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Run Azure webapp deploy'
+        uses: azure/webapps-deploy@v2
+        with: 
+          app-name: ${{ secrets.PA_DEMO_APP_REGISTRATION }}         
+          package: '${{ env.AZURE_WEATHER_API_DIRECTORY}}/${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'      
