@@ -21,9 +21,14 @@
 param location string
 param suffix string
 param appInsightsName string
+param redisName string
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' existing = {
   name: appInsightsName
+}
+
+resource cache 'Microsoft.Cache/redis@2021-06-01' existing = {
+  name: redisName
 }
 
 resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
@@ -37,41 +42,6 @@ resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
     capacity: 1
   }
   kind: 'app'
-}
-
-resource webAppClient 'Microsoft.Web/sites@2020-06-01' = {
-  name: 'webapp-blazor-${suffix}'
-  location: location  
-  properties: {
-    serverFarmId: serverFarm.id    
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: appInsights.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsights.properties.ConnectionString
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~2'
-        }        
-      ]
-      vnetRouteAllEnabled: true
-      metadata: [
-        {
-          name: 'CURRENT_STACK'
-          value: 'dotnet'
-        }
-      ]
-      netFrameworkVersion: 'v7.0'
-      alwaysOn: true      
-    }    
-    clientAffinityEnabled: false
-    httpsOnly: true
-  }  
 }
 
 resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
@@ -92,7 +62,11 @@ resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
         {
           name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
           value: '~2'
-        }        
+        }
+        {
+          name: 'RedisCnxString'
+          value: cache.listKeys().primaryKey
+        }
       ]
       vnetRouteAllEnabled: true
       metadata: [

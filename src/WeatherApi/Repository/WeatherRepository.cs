@@ -33,7 +33,7 @@ public class WeatherRepository : IWeatherRepository
         }
     }
 
-    public async Task<City> GetWeatherAsync(City city)
+    public async Task<WeatherForecast[]> GetWeatherAsync(City city)
     {
         try
         {
@@ -48,8 +48,7 @@ public class WeatherRepository : IWeatherRepository
 
             if (value.HasValue)
             {
-                var returnedCity = JsonConvert.DeserializeObject<City>(value.ToString());
-                returnedCity.ValueFromCache = true;
+                var returnedCity = JsonConvert.DeserializeObject<WeatherForecast[]>(value.ToString());                
                 return returnedCity;
             }
 
@@ -62,22 +61,24 @@ public class WeatherRepository : IWeatherRepository
         }
     }
 
-    public async Task SetSequenceValue(City city)
+    public async Task SaveForecastsCityAsync(City city,WeatherForecast[] weatherForecasts)
     {
         try
         {
-
             string key = $"{city.Name}-{city.Country}";
 
             if (!_cacheAvailable)
                 return;
 
-            await _database.StringSetAsync(new RedisKey(key),
-                                           new RedisValue(JsonConvert.SerializeObject(city)));
+            _logger.LogDebug($"Set value {key} to cache");
+
+            var value = JsonConvert.SerializeObject(weatherForecasts);
+
+            await _database.StringSetAsync(new RedisKey(key), value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError("Cannot set value in cache", ex.Message);
+            _logger.LogError("Cannot set value to cache", ex.Message);
         }
     }
 

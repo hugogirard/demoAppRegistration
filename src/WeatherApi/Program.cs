@@ -12,48 +12,82 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration["RedisCnxString"];
-});
 builder.Services.AddSingleton<IWeatherRepository, WeatherRepository>();
 
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(o => 
+{
+    o.RoutePrefix = string.Empty;
+    o.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API V1");
+});
 
 app.UseHttpsRedirection();
 
-var scopeRequiredByApi = app.Configuration["AzureAd:Scopes"] ?? "";
+var readWeatherScope = app.Configuration["AzureAd:Scopes:ReadWeatherScope"] ?? "";
+var readWeatherMarsScope = app.Configuration["AzureAd:Scopes:ReadWeatherMars"] ?? "";
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/api", (IWeatherRepository weatherRepository, HttpContext httpContext, string city, string country) =>
+app.MapGet("/api", async (IWeatherRepository weatherRepository, HttpContext httpContext, string cityName, string country) =>
 {
-    //httpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+    httpContext.VerifyUserHasAnyAcceptedScope(readWeatherScope);
+    
+    var city = new City { Name = cityName, Country = country };
 
+    var cachedValue = await weatherRepository.GetWeatherAsync(city);
 
+    if (cachedValue != null)           
+        return cachedValue;
+        
+    var forecasts =  Enumerable.Range(1, 5).Select(index =>
+                        new WeatherForecast
+                        (
+                            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                            Random.Shared.Next(-20, 55),
+                            summaries[Random.Shared.Next(summaries.Length)]
+                        ))
+                        .ToArray();
 
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    await weatherRepository.SaveForecastsCityAsync(city,forecasts);
+
+    return forecasts;
 })
 .WithName("GetWeatherForecast")
-.WithOpenApi();
-//.RequireAuthorization();
+.WithOpenApi()
+.RequireAuthorization();
+
+app.MapGet("/api/getWeatherFromMars", async (IWeatherRepository weatherRepository, HttpContext httpContext) =>
+{
+    httpContext.ValidateAppRole(new string[] { "SecretAgent" });
+    httpContext.VerifyUserHasAnyAcceptedScope(readWeatherScope);
+    
+    var city = new City { Name = "Mars", Country = "Mars" };
+
+    var cachedValue = await weatherRepository.GetWeatherAsync(city);
+
+    if (cachedValue != null)
+        return cachedValue;
+
+    var forecasts =  Enumerable.Range(1, 5).Select(index =>
+                        new WeatherForecast
+                        (
+                            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                            Random.Shared.Next(-140, 21),
+                            summaries[Random.Shared.Next(summaries.Length)]
+                        ))
+                        .ToArray();
+
+    await weatherRepository.SaveForecastsCityAsync(city,forecasts);
+
+    return forecasts;
+})
+.WithName("GetWeatherForecastFromMars")
+.WithOpenApi()
+.RequireAuthorization();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
