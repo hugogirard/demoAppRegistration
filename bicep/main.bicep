@@ -42,16 +42,6 @@ module monitoring 'monitoring/monitoring.bicep' = {
   }
 }
 
-module web 'webapp/web.bicep' = {
-  scope: resourceGroup(rg.name)
-  name: 'web'
-  params: {
-    appInsightsName: monitoring.outputs.appInsightName
-    location: location
-    suffix: suffix
-  }
-}
-
 module redis 'redis/redis.bicep' = {
   scope: resourceGroup(rg.name)
   name: 'redis'
@@ -60,3 +50,16 @@ module redis 'redis/redis.bicep' = {
     suffix: suffix
   }
 }
+
+
+module web 'webapp/web.bicep' = {
+  scope: resourceGroup(rg.name)
+  name: 'web'
+  params: {
+    appInsightsName: monitoring.outputs.appInsightName
+    location: location
+    suffix: suffix
+    redisName: redis.outputs.cacheName
+  }
+}
+

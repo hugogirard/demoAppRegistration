@@ -12,7 +12,7 @@ Now, you need to have a service principal to connect to Azure and execute the Gi
 
 To do so, refer to this [documentation](https://github.com/marketplace/actions/azure-login#configure-a-service-principal-with-a-secret) and save the generated values.
 
-Next, you will need to create a token that will be used to write secret in your GitHub repository.  Follow this documentation to do so, be careful the permission will be different if you use a public or private repository.  **IMPORTANT**, the name of the token need to be **PA_DEMO_APP_REGISTRATION**.
+Next, you will need to create a token that will be used to write secret in your GitHub repository.  Follow this [documentation](https://github.com/marketplace/actions/create-github-secret-action) to do so, be careful the permission will be different if you use a public or private repository.  **IMPORTANT**, the name of the token need to be **PA_DEMO_APP_REGISTRATION**.
 
 Once is done you will need to create 3 [GitHub Actions Secrets](https://docs.github.com/en/rest/actions/secrets) in your repository.
 
