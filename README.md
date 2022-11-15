@@ -107,9 +107,18 @@ Now, before calling the API, you will need to add some configuration about it's 
 | AzureAd:Domain | The domain associated with your Azure Active Directory |
 | AzureAd:TenantId | The tenant ID associated with your Azure Active Directory |
 | AzureAd:ClientId | The client ID of the App registrations of Contoso Weather |
-| AzureAd:Scopes:ReadWeatherScope | The value of the Read Weather Scope in the Expose API blade of your App registration.  Be sure to copy the complete value near the scope clicking the copy button. |
-| AzureAd:Scopes:ReadWeatherMars | Same than the previous step but for the scope Read.Weather.From.Mars
+| AzureAd:Scopes:ReadWeatherScope | Read.City.Weather |
+| AzureAd:Scopes:ReadWeatherMars | Read.Weather.From.Mars
 
 ## Deploy the Rest API
 
 Now, you can deploy the rest api, go to the GitHub actions tab and click on the **Deploy API** and run the workflow.
+
+# Test your API
+
+Now you are ready to test to call your API.  Use Postman to authenticate like mentionned in the blog, once you have your bearer token you can call the two API endpoint.
+
+To find the endpoint you can navigate to Azure Web App and open the API with the URL.  This will open swagger so you will be fine to know the endpoint.
+
+One user has the SecretAgent role so it will be able to query the weather from Mars endpoint.  The one with the Guest role won't be able.
+
