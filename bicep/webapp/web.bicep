@@ -44,6 +44,8 @@ resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
   kind: 'app'
 }
 
+var redisCacheCnxString = '${cache.name}.redis.cache.windows.net:6380,password=${cache.listKeys().primaryKey},ssl=True,abortConnect=False'
+
 resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
   name: 'webapp-api-weather-${suffix}'
   location: location  
@@ -65,7 +67,7 @@ resource webAppApi 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'RedisCnxString'
-          value: cache.listKeys().primaryKey
+          value: redisCacheCnxString
         }
       ]
       vnetRouteAllEnabled: true
