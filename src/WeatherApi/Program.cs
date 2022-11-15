@@ -27,6 +27,8 @@ app.UseHttpsRedirection();
 
 var readWeatherScope = app.Configuration["AzureAd:Scopes:ReadWeatherScope"] ?? "";
 var readWeatherMarsScope = app.Configuration["AzureAd:Scopes:ReadWeatherMars"] ?? "";
+var deleteCacheScope = app.Configuration["AzureAd:Scopes:DeleteCacheScope"] ?? "";
+
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -86,6 +88,18 @@ app.MapGet("/api/getWeatherFromMars", async (IWeatherRepository weatherRepositor
     return forecasts;
 })
 .WithName("GetWeatherForecastFromMars")
+.WithOpenApi()
+.RequireAuthorization();
+
+app.MapDelete("/api/deleteCache", async (IWeatherRepository weatherRepository, HttpContext httpContext) =>
+{
+    httpContext.ValidateAppRole(new string[] { "Admin.Weather.App" });
+    httpContext.VerifyUserHasAnyAcceptedScope(deleteCacheScope);
+    
+    await weatherRepository.ClearCacheAsync();
+    
+})
+.WithName("DeleteCache")
 .WithOpenApi()
 .RequireAuthorization();
 
